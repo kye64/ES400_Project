@@ -10,6 +10,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab 
 import os
+import datetime
+import matplotlib
+
+import warnings
+import itertools
+
+warnings.filterwarnings("ignore")
+plt.style.use('fivethirtyeight')
+import statsmodels.api as sm
+
+matplotlib.rcParams['axes.labelsize'] = 14
+matplotlib.rcParams['xtick.labelsize'] = 12
+matplotlib.rcParams['ytick.labelsize'] = 12
+matplotlib.rcParams['text.color'] = 'k'
+
 
 # make a list of names of csv files in the Current Working Directory (CWD)
 csv_files = [f for f in os.listdir(os.getcwd()) if f.endswith('.csv')]
@@ -54,12 +69,42 @@ np.asarray(resamples[17])
 np.asarray(resamples[18])
 np.asarray(resamples[19])
 
+df0 = pd.DataFrame(resamples[0])
+df1 = pd.DataFrame(resamples[1])
 
-print resamples[0]
-print resamples[19]
+# merge the dataframes of years 1998-2017 into one continuous dataframe
+solution = pd.concat(resamples)
+print (solution)
+
+# find the GHI means grouped by days of each month
+solute = solution.groupby([solution.index.month, solution.index.day]).mean()
+print (solute)   
+
+df0.plot(figsize=(15,6))
+plt.show()
+solution.plot(figsize=(15,6))
+plt.show()
+
+
+#print (resamples[0])
+#print (resamples[19])
+
+#a = resamples.groupby([resamples.index.month, resamples.index.day]).mean()
+
+#dataf1 = pd.DataFrame({'col':dataframes[0]})
+#print (dataf1)
+
+
+
+
+
+
+
+
+
 #mean = np.mean( np.array([ resamples[0:19]]), axis=0 )
 #a = np.array([resamples[0],resamples[1]])
-np.mean(zip(resamples[0],resamples[1]),axis=1)
+#np.mean(zip(resamples[0],resamples[1]),axis=1)
     
 
 # you can access items in the lists by indexing into them like: dataframes[0]
