@@ -56,11 +56,14 @@ for f in csv_files:
 
 # merge the dataframes of years 1998-2017 into one continuous dataframe
 
+basic = pd.concat(Whresamples)
+z = basic['GHI']
+z.interpolate(inplace=True)
 solution = pd.concat(Whperday)
 kWhperday = solution.div(1000)
 y = kWhperday['GHI']
 y.interpolate(inplace=True)
-print y.head(365)
+#print y.head(365)
 
 
 #sol1 = pd.concat(Whperday[0:5])
@@ -72,18 +75,21 @@ print y.head(365)
 #plt.show()
 # find the GHI means grouped by days of each month
 
-duo = y.plot(figsize=(15,6))
+duo = z.plot(figsize=(15,6))
 plt.show()
 
-fig = duo.get_figure()
-fig.savefig("ARIMA1.png",bbox_inches='tight')
+# save figure as PNG file
+#fig = duo.get_figure()
+#fig.savefig("ARIMA1.png",bbox_inches='tight')
 
 # trend, seasonality, noise
 pyl.rcParams['figure.figsize'] = 18, 8
-decomposition = sm.tsa.seasonal_decompose(y, model='additive')
+decomposition = sm.tsa.seasonal_decompose(z, model='additive')
 fig = decomposition.plot()
 plt.show()
 
+# save figure as PNG file
+#fig.savefig('ARIMA2.png', dpi =400)
 
 
 # ARIMA
@@ -96,15 +102,15 @@ seasonal_pdq = [(x[0], x[1], x[2], 12) for x in list(itertools.product(p, d, q))
 #print('SARIMAX: {} x {}'.format(pdq[2], seasonal_pdq[3]))
 #print('SARIMAX: {} x {}'.format(pdq[2], seasonal_pdq[4]))
 
-#for param in pdq:
-#    for param_seasonal in seasonal_pdq:
-#        try:
-#            mod = sm.tsa.statespace.SARIMAX(y,order=param, seasonal_order=param_seasonal, enforce_stationarity=False, enforce_invertibility=False)
-#            results = mod.fit()
-#
-#            print('ARIMA{}x{}12 - AIC:{}'.format(param, param_seasonal, results.aic))
-#        except:
-#            continue
+for param in pdq:
+    for param_seasonal in seasonal_pdq:
+        try:
+            mod = sm.tsa.statespace.SARIMAX(z,order=param, seasonal_order=param_seasonal, enforce_stationarity=False, enforce_invertibility=False)
+            results = mod.fit()
+
+            print('ARIMA{}x{}12 - AIC:{}'.format(param, param_seasonal, results.aic))
+        except:
+            continue
 
 mod = sm.tsa.statespace.SARIMAX(y,
                                 order=(1, 1, 1),
@@ -126,8 +132,8 @@ plt.show()
 #results.plot_diagnostics(figsize=(12, 16))
 #plt.show()
 
-fig = results.get_figure()
-fig.savefig("1.png",bbox_inches='tight')
+
+fig.savefig('1.png',dpi=400)
 
 
 pred = results.get_prediction(start=pd.to_datetime('2017-01-01'), dynamic=False)
